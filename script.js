@@ -3,66 +3,97 @@ console.log(ags);
 console.log(lands);
 console.log(mietwert);
 
+function getLand(ags) {
+    return lands[parseInt(ags.slice(0,-6))-1];
+}
+
+function hide(hideAGS = true) {
+    document.getElementById("report").style.display = "none";
+    document.getElementById("eingaben").style.display = "none";
+    document.getElementById("ham_eingaben").style.display = "none";
+    document.getElementById("bw_eingaben").style.display = "none";
+    if(hideAGS) document.getElementById("agsDiv").style.display = "none";
+}
+
+function pickLand() {
+    hide();
+    let landSelect = document.getElementById("landSelect");
+    let townSelect = document.getElementById("townSelect");
+    let agsSelect = document.getElementById("agsSelect");
+    townSelect.innerHTML = "<option>---</option>";
+    agsSelect.innerHTML = "<option>---</option>";
+    if(landSelect.value=="---") return;
+
+    // fill towns
+    for (const town of ags) {
+        if(getLand(town.AGS).Land != landSelect.value) continue;
+        let option = document.createElement("option");
+        option.innerHTML = town.Gemeinde;
+        townSelect.appendChild(option);
+    }
+}
+
+function pickTown() {
+    hide();
+    let landSelect = document.getElementById("landSelect");
+    let townSelect = document.getElementById("townSelect");
+    let agsSelect = document.getElementById("agsSelect");
+    document.getElementById("agsDiv").style.display = "none";
+    agsSelect.innerHTML = "<option>---</option>";
+    if(landSelect.value=="---") return;
+    if(townSelect.value=="---") return;
+
+    // fill AGS
+    agsSelect.innerHTML = "";
+    for (const town of ags) {
+        if(getLand(town.AGS).Land != landSelect.value) continue;
+        if(town.Gemeinde.trim() != townSelect.value) continue;
+        let option = document.createElement("option");
+        option.innerHTML = town.AGS
+        agsSelect.appendChild(option);
+    }
+    if(agsSelect.children.length >= 2)
+        document.getElementById("agsDiv").style.display = "block";
+    else
+        setTown();
+}
+
 var town;
-document.addEventListener("DOMContentLoaded", function() {
 
-    // autocompletion
-    document.getElementById("townSelect").addEventListener("keyup", function (event) {
-        var input = event.target.value;
-        if (input.length >= 2 ) {
-            var townlist = document.getElementById("townlist");
-            townlist.innerHTML = "";
-            var have = 0;
-            for (const town of ags) {
-                if(! town.Gemeinde.includes(input)) continue;
-                var option = document.createElement("option");
-                option.value = town.Gemeinde;
-                townlist.appendChild(option);
-                have += 1;
-                if(have==20) break;
-            }
-        }
-    });
+function setTown() {
+    hide(false);
+    var chosenAGS = document.getElementById("agsSelect").value;
+    town = undefined;
+    for (const t of ags) 
+        if(t.AGS==chosenAGS) 
+            town=t;
+    if(!town)
+        console.log("found no town for AGS", chosenAGS);
+}
 
-    // choose town button
-    document.getElementById("doWork").addEventListener("click", function(){
-        var chosenTown = document.getElementById("townSelect").value;
-        var select = document.getElementById("ags");
-        select.innerHTML = "";
-        town = undefined;
-        var i;
-        for(i=0; i<ags.length; i++) {
-            if(chosenTown!=ags[i].Gemeinde) continue;
-            if(!town) town = ags[i];
-            var option = document.createElement("option");
-            option.value = i;
-            option.innerHTML = ags[i].AGS;
-            select.appendChild(option);
-        }
-        document.getElementById("report").style.display = "none";
-        document.getElementById("eingaben").style.display = "none";
-        if(!town) return;
+
+function prepareInputs() {
+    hide(false);
+    if(!town) return;
+    land = getLand(town.AGS);
+    if(!land) return;
+    if(land.Land == "Hamburg") {
+        document.getElementById("ham_eingaben").style.display = "block";
+        document.getElementById("ham_hebesatz").value = 100*town.Hebesatz; // TODO
+    } else if(land.Land == "Baden-Württemberg") {
+        document.getElementById("bw_eingaben").style.display = "block";
+        document.getElementById("bw_hebesatz").value = 350; // TODO
+    } else {
         document.getElementById("eingaben").style.display = "block";
         document.getElementById("hebesatz").value = 100*town.Hebesatz;
-    });
-
-    // change ags
-    document.getElementById("ags").addEventListener("change", function(e){
-        town = ags[e.target.selectedOptions[0].value];
-        document.getElementById("hebesatz").value = 100*town.Hebesatz;
-        document.getElementById("report").style.display = "none";
-    });
-
-    document.getElementById("update").addEventListener("click",createReport);
-});
-
-
+    }
+}
 
 function createReport(){
     var report = document.getElementById("report");
     report.style.display = "none";
     if(!town) return;
-    var land = lands[parseInt(town.AGS.substring(0, town.AGS.length == 7 ? 1 : 2)) -1]; // first two digits of AGS
+    var land = getLand(town.AGS); // first two digits of AGS
     if(!land) return;
 
     var flats = Number(document.getElementById("wohnungen").value); // F
@@ -119,12 +150,63 @@ function createReport(){
     var some_factor = (house_type == "MFH" && social) ? 0.000255 : 0.00034;
     var annual_tax = round2(object_worth * increase * some_factor);
 
-    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("land").innerHTML = land.Land;
+    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
+    document.getElementById("ags").innerHTML = town.AGS;
     document.getElementById("tax").innerHTML = annual_tax;
     report.style.display = "block";
 }
 
+function createReportHamburg() {
+    let for_living = document.getElementById("ham_zweck").checked;
+    let location = document.getElementById("ham_wohnlage").value;
+    let area_total = Number(document.getElementById("ham_area_total").value); 
+    let area_indoor = Number(document.getElementById("ham_area_indoor").value);
+    let area_use = Number(document.getElementById("ham_area_use").value);
+    let increase = Number(document.getElementById("ham_hebesatz").value)/100;
+
+    let result = 0;
+    result += area_total * 0.02; // E15
+    result += area_indoor * 0.2 * (location=="gut" ? 1.00 : 0.75); // E20
+    if(!for_living) result += area_use * 0.4; // E23
+    let annual_tax = round2(result * increase);
+
+    document.getElementById("land").innerHTML = "Hamburg";
+    document.getElementById("gemeinde").innerHTML = "Hamburg";
+    document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("tax").innerHTML = annual_tax;
+    document.getElementById("report").style.display = "block";
+}
+
+function createReportBW() {
+    let area = Number(document.getElementById("bw_area").value); 
+    let house_type = document.getElementById("bw_house_type").value // TODO unused
+    let owner_type = document.getElementById("bw_owner_type").value
+    let for_living = document.getElementById("bw_zweck").checked;
+    let b17_answered_yes = document.getElementById("bw_option1").checked || document.getElementById("bw_option2").checked;
+    let increase = Number(document.getElementById("bw_hebesatz").value); 
+    let ground_value = Number(document.getElementById("bw_ground_value").value);
+    let memorial = document.getElementById("bw_memorial").checked; // TODO unused
+
+    let tax_value = area * ground_value;
+    let tax_number = 0.0013;
+    if(for_living) {
+        tax_number *= 0.7;
+        if(b17_answered_yes || (owner_type != "Privatperson"))
+            tax_number *= 0.75;
+    }
+
+    let annual_tax = tax_value * tax_number * increase;
+
+    let land = getLand(town.AGS);
+    document.getElementById("land").innerHTML = land.Land;
+    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
+    document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("report").style.display = "block";
+}
+
+function floor_2(x) { return Math.floor(x/100)*100; }
 function round_2(x) { return Math.round(x/100)*100; }
 function round2(x) { return Math.round(x*100)/100; }
 function round3(x) { return Math.round(x*1000)/1000; }

@@ -10,18 +10,41 @@
     <style> span { background-color:yellow } </style>
   </head>
   <body>
-    <h1>Bitte Gemeinde auswählen</h1>
-    <input type="text" id="townSelect" list="townlist">
-    <datalist id="townlist"></datalist>
-    <button type="button" id="doWork">auswählen!</button>
+    <h1>Bitte Bundesland und Gemeinde auswählen</h1>
+    <select id="landSelect" onchange="pickLand()">
+      <option>---</option>
+      <option>Baden-Württemberg</option>
+      <option>Bayern</option>
+      <option>Berlin</option>
+      <option>Brandenburg</option>
+      <option>Bremen</option>
+      <option>Hamburg</option>
+      <option>Hessen</option>
+      <option>Mecklenburg-Vorpommern</option>
+      <option>Niedersachsen</option>
+      <option>Nordrhein-Westfalen</option>
+      <option>Rheinland-Pfalz</option>
+      <option>Saarland</option>
+      <option>Sachsen</option>
+      <option>Sachsen-Anhalt</option>
+      <option>Schleswig-Holstein</option>
+      <option>Thüringen</option>
+    </select>
+    <select id='townSelect' onchange="pickTown()">
+      <option>---</option>
+    </select>
+    <div id="agsDiv" style="display:none">
+      In diesem Bundesland gibt es mehrere Gemeinden mit diesem Namen. Bitte wählen Sie Ihren amtlichern Gemeindeschlüssel (AGS).
+      <select id='agsSelect' onchange="setTown()"></select>
+    </div>
+    <button type="button" onclick="prepareInputs()">auswählen!</button>
 
     <div id="eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
-        Amtlicher Gemeindeschlüssel (AGS) <select id="ags" style="min-width:200px"></select></br>
         Anzahl Wohnungen im Objekt <input type="number" id="wohnungen" value="12"></br>
         Baujahr <input type="number" id="baujahr" value="1981"></br>
-        Wohnfläche <input type="number" id="area_indoor" value="99"> m<sup>2</sup></br>
         Grundstücksfläche <input type="number" id="area_total" value="288"> m<sup>2</sup></br>
+        Wohnfläche <input type="number" id="area_indoor" value="99"> m<sup>2</sup></br>
         Gebäudeart <select id="house_type">
             <option>EFH</option>
             <option selected="selected">MFH</option>
@@ -32,13 +55,74 @@
         Hebesatz <input type="number" id="hebesatz" value="2000">%</br>
         Sozialer Wohnungsbau <input type="checkbox" id="social"></br>
 
-        Nach dem Anpassen aller Angaben bitte auf <button type="button" id="update">Berechnen!</button> clicken.
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReport()">Berechnen!</button> clicken.
+    </div>
+
+    <div id="ham_eingaben" style="display:none">
+        <h1>Angaben zum Objekt</h1>
+        Werden Gebäudeflächen vornehmlich zu Wohnzwecken genutzt? (mehr als 50% Wohnfläche) <input type="checkbox" id="ham_zweck"></br>
+        Wohnlage <select id="ham_wohnlage"> <option>normal</option> <option>gut</option> </select> </br>
+        Grundstücksfläche <input type="number" id="ham_area_total" value="1000"> m<sup>2</sup></br>
+        Wohnfläche <input type="number" id="ham_area_indoor" value="200"> m<sup>2</sup></br>
+        Nutzfläche <input type="number" id="ham_area_use" value="600"> m<sup>2</sup></br>
+        Hebesatz <input type="number" id="ham_hebesatz" value="1000">%</br>
+
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportHamburg()">Berechnen!</button> clicken.
+    </div>
+
+    <div id="bw_eingaben" style="display:none">
+        <h1>Angaben zum Objekt</h1>
+        Gebäudeart (§ 249 Grundstücksarten 1.-4.)
+        <select id="bw_house_type">
+            <option>MFH</option>
+            <option>EFH/ZFH</option>
+            <option>WEG</option>
+        </select></br>
+
+        Die Steuermesszahl nach Absatz 2 wird um 30 Prozent ermäßigt, wenn das Grundstück (§ 37) überwiegend Wohnzwecken dient. </br>
+        Überwiegend dient ein Grundstück zu Wohnzwecken, wenn der Anteil der Wohnnutzung </br>
+        an der gesamten Wohn- und Nutzfläche den Anteil der wohnfremden Nutzung übersteigt.</br>
+        Werden Gebäudeflächen vornehmlich zu Wohnzwecken genutzt? <input type="checkbox" id="bw_zweck"></br>
+
+        Grundstücksfläche (bzw. Miteigentumsanteil im Falle von WEG)
+        <input type="number" id="bw_area" value="500"> m<sup>2</sup></br>
+
+        </br>
+        Für das Grundstück wurde eine Förderung nach dem Landeswohnraumförderungsgesetz (LWoFG) vom 11. Dezember 2007 (GBl. 2007, S. 581), 
+        das zuletzt durch Artikel 1 des Gesetzes vom 7. Mai 2020 (GBl. S. 253) geändert worden ist, durch schriftlichen Verwaltungsakt zugesagt und
+        die sich aus der Förderzusage ergebenden Bestimmungen werden im Sinne des Landeswohnraumförderungsgesetzes 
+        für jeden Erhebungszeitraum innerhalb des Hauptveranlagungszeitraums eingehalten.
+        <input type="checkbox" id="bw_option1"></br>
+
+        </br>
+        Für das Grundstück wurde nach § 13 Absatz 3 des Wohnraumförderungsgesetzes (WoFG) vom 13. September 2001 (BGBl. I S. 2376), 
+        das zuletzt durch Artikel 3 des Gesetzes vom 2. Oktober 2015 (BGBl. I S. 1610) geändert worden ist, 
+        eine Förderzusage durch schriftlichen Verwaltungsakt erteilt 
+        und die sich aus der Förderzusage ergebenden Bestimmungen im Sinne § 13 Abs. 2 LWoFG 
+        oder des § 13 Absatz 2 des WoFG werden für jeden Erhebungszeitraum innerhalb des Hauptveranlagungszeitraums eingehalten.
+        <input type="checkbox" id="bw_option2"></br>
+
+        Eigentümerform
+        <select id="bw_owner_type">
+            <option>Privatperson</option>
+            <option>Genossenschaft/Verein</option>
+            <option>Wohnungsbaugesellschaft</option>
+        </select> </br>
+
+        Befinden sich auf dem Grundstück Gebäude, die Kulturdenkmale im Sinne des Gesetzes zum Schutz der Kulturdenkmale (Denkmalschutzgesetz Baden-Württemberg) sind?
+        <input type="checkbox" id="bw_memorial"></br>
+
+        Bodenrichtwert <input type="number" id="bw_ground_value" value="20"> &euro;</br>
+        Hebesatz <input type="number" id="bw_hebesatz" value="350">%</br>
+
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportBW()">Berechnen!</button> clicken.
     </div>
 
     <div id="report" style="display:none">
         <h1>Bericht</h1>
-        Ort <span id='gemeinde'>TODO</span></br>
         Bundesland <span id='land'>TODO</span></br>
+        Ort <span id='gemeinde'>TODO</span></br>
+        AGS <span id='ags'>TODO</span></br>
         Jährliche Grundsteuer <span id="tax">TODO</span>
     </div>
   </body>
