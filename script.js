@@ -95,7 +95,7 @@ function createReport(){
     var remaining_usage_capped = Math.max(24, remaining_usage); // Q
     var kennwert_usage = remaining_usage_capped - 22; // R
     // Anlage 14 Anlage 40 (zu § 255 Absatz 2)
-    var tax_non_relocatable = bewirtschaftungskosten(remaining_usage, house_type); // T
+    var tax_non_relocatable = bewirtschaftungskosten(remaining_usage_capped, house_type); // T
     var annual_raw = round2(12 * area_indoor * value_avg_rent2); // AH
     var non_relocatable_cost = round2(annual_raw * (tax_non_relocatable / 100)); // U
     // Anlage 10 Anlage 36 (zu § 251 und § 257 Absatz 1)
