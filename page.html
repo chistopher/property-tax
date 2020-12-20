@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tool 2</title>
+    <script src="ags.js"></script>
+    <script src="lands.js"></script>
+    <script src="mietwert.js"></script>
+    <script src="script.js"></script>
+    <style> span { background-color:yellow } </style>
+  </head>
+  <body>
+    <h1>Bitte Gemeinde auswählen</h1>
+    <input type="text" id="townSelect" list="townlist">
+    <datalist id="townlist"></datalist>
+    <button type="button" id="doWork">auswählen!</button>
+
+    <div id="eingaben" style="display:none">
+        <h1>Angaben zum Objekt</h1>
+        Amtlicher Gemeindeschlüssel (AGS) <select id="ags" style="min-width:200px"></select></br>
+        Anzahl Wohnungen im Objekt <input type="number" id="wohnungen" value="12"></br>
+        Baujahr <input type="number" id="baujahr" value="1981"></br>
+        Wohnfläche <input type="number" id="area_indoor" value="99"> m<sup>2</sup></br>
+        Grundstücksfläche <input type="number" id="area_total" value="288"> m<sup>2</sup></br>
+        Gebäudeart <select id="house_type">
+            <option>EFH</option>
+            <option selected="selected">MFH</option>
+            <option>ZFH</option>
+            <option>WEG</option>
+        </select> (§ 249 Grundstücksarten 1.-4.)</br>
+        Bodenrichtwert <input type="number" id="ground" value="2000"> &euro;</br>
+        Hebesatz <input type="number" id="hebesatz" value="2000">%</br>
+        Sozialer Wohnungsbau <input type="checkbox" id="social"></br>
+
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" id="update">Berechnen!</button> clicken.
+    </div>
+
+    <div id="report" style="display:none">
+        <h1>Bericht</h1>
+        Ort <span id='gemeinde'>TODO</span></br>
+        Bundesland <span id='land'>TODO</span></br>
+        Jährliche Grundsteuer <span id="tax">TODO</span>
+    </div>
+  </body>
+</html>
