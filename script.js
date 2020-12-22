@@ -12,6 +12,7 @@ function hide(hideAGS = true) {
     document.getElementById("eingaben").style.display = "none";
     document.getElementById("ham_eingaben").style.display = "none";
     document.getElementById("bw_eingaben").style.display = "none";
+    document.getElementById("bayern_eingaben").style.display = "none";
     if(hideAGS) document.getElementById("agsDiv").style.display = "none";
 }
 
@@ -82,7 +83,10 @@ function prepareInputs() {
         document.getElementById("ham_hebesatz").value = 100*town.Hebesatz; // TODO
     } else if(land.Land == "Baden-Württemberg") {
         document.getElementById("bw_eingaben").style.display = "block";
-        document.getElementById("bw_hebesatz").value = 350; // TODO
+        document.getElementById("bw_hebesatz").value = 100*town.Hebesatz; // TODO
+    } else if(land.Land == "Bayern") {
+        document.getElementById("bayern_eingaben").style.display = "block";
+        document.getElementById("bayern_hebesatz").value = 100*town.Hebesatz; // TODO
     } else {
         document.getElementById("eingaben").style.display = "block";
         document.getElementById("hebesatz").value = 100*town.Hebesatz;
@@ -147,8 +151,10 @@ function createReport(){
     var object_worth = Math.max(min_value, round_2(interesting_ground+cash_clean)); // AP
 
     // Steuermesszahl: 0,34 §15 (1) 2. a)/b)
-    var some_factor = (house_type == "MFH" && social) ? 0.000255 : 0.00034;
-    var annual_tax = round2(object_worth * increase * some_factor);
+    let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00034;
+    if(house_type == "MFH" && social)
+        some_factor *= 0.75; // 25% less
+    let annual_tax = round2(object_worth * increase * some_factor);
 
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
@@ -180,13 +186,12 @@ function createReportHamburg() {
 
 function createReportBW() {
     let area = Number(document.getElementById("bw_area").value); 
-    let house_type = document.getElementById("bw_house_type").value // TODO unused
     let owner_type = document.getElementById("bw_owner_type").value
     let for_living = document.getElementById("bw_zweck").checked;
     let b17_answered_yes = document.getElementById("bw_option1").checked || document.getElementById("bw_option2").checked;
-    let increase = Number(document.getElementById("bw_hebesatz").value); 
+    let increase = Number(document.getElementById("bw_hebesatz").value)/100; 
     let ground_value = Number(document.getElementById("bw_ground_value").value);
-    let memorial = document.getElementById("bw_memorial").checked; // TODO unused
+    let memorial = document.getElementById("bw_memorial").checked;
 
     let tax_value = area * ground_value;
     let tax_number = 0.0013;
@@ -195,6 +200,7 @@ function createReportBW() {
         if(b17_answered_yes || (owner_type != "Privatperson"))
             tax_number *= 0.75;
     }
+    if(memorial) tax_number *= 0.9;
 
     let annual_tax = tax_value * tax_number * increase;
 
@@ -202,12 +208,41 @@ function createReportBW() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("tax").innerHTML = round2(annual_tax);
+    document.getElementById("report").style.display = "block";
+}
+
+function createReportBayern() {
+    let area = Number(document.getElementById("bayern_area").value); 
+    let area_house = Number(document.getElementById("bayern_area_house").value); 
+    let area_living = Number(document.getElementById("bayern_area_living").value); 
+    let increase = Number(document.getElementById("bayern_hebesatz").value)/100; 
+    let memorial = document.getElementById("bayern_memorial").checked;
+    let forestry = document.getElementById("bayern_forestry").checked;
+
+    let C15 = area - 10*area_house;
+    let D15 = area_house * 10;
+    let ground_value = C15>0 ? D15*0.04 + C15*0.02 : area * 0.04;
+    let ground_tax = round1(ground_value);
+
+    let house_value = Math.round(area_living * 0.5);
+    let tax_number = 0.7;
+    if(memorial || forestry) tax_number *= 0.75; // 25% less
+    let house_tax = house_value * tax_number;
+
+    let annual_tax = (ground_tax + house_tax) * increase;
+
+    let land = getLand(town.AGS);
+    document.getElementById("land").innerHTML = land.Land;
+    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
+    document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("tax").innerHTML = round2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
 function floor_2(x) { return Math.floor(x/100)*100; }
 function round_2(x) { return Math.round(x/100)*100; }
+function round1(x) { return Math.round(x*10)/10; }
 function round2(x) { return Math.round(x*100)/100; }
 function round3(x) { return Math.round(x*1000)/1000; }
 function round4(x) { return Math.round(x*10000)/10000; }

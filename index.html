@@ -72,13 +72,6 @@
 
     <div id="bw_eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
-        Gebäudeart (§ 249 Grundstücksarten 1.-4.)
-        <select id="bw_house_type">
-            <option>MFH</option>
-            <option>EFH/ZFH</option>
-            <option>WEG</option>
-        </select></br>
-
         Die Steuermesszahl nach Absatz 2 wird um 30 Prozent ermäßigt, wenn das Grundstück (§ 37) überwiegend Wohnzwecken dient. </br>
         Überwiegend dient ein Grundstück zu Wohnzwecken, wenn der Anteil der Wohnnutzung </br>
         an der gesamten Wohn- und Nutzfläche den Anteil der wohnfremden Nutzung übersteigt.</br>
@@ -112,10 +105,28 @@
         Befinden sich auf dem Grundstück Gebäude, die Kulturdenkmale im Sinne des Gesetzes zum Schutz der Kulturdenkmale (Denkmalschutzgesetz Baden-Württemberg) sind?
         <input type="checkbox" id="bw_memorial"></br>
 
-        Bodenrichtwert <input type="number" id="bw_ground_value" value="20"> &euro;</br>
+        Bodenrichtwert <input type="number" id="bw_ground_value" value="250"> &euro;</br>
         Hebesatz <input type="number" id="bw_hebesatz" value="350">%</br>
 
         Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportBW()">Berechnen!</button> clicken.
+    </div>
+
+    <div id="bayern_eingaben" style="display:none">
+        <h1>Angaben zum Objekt</h1>
+
+        Grundstücksfläche <input type="number" id="bayern_area" value="1000"> m<sup>2</sup></br>
+        Gebäudegrundfläche <input type="number" id="bayern_area_house" value="100"> m<sup>2</sup></br>
+        Gebäudefläche <input type="number" id="bayern_area_living" value="140"> m<sup>2</sup></br>
+
+        Handelt es sich bei dem Gebäude um ein Baudenkmal nach Art. 1 Abs. 2 Satz 1 oder Abs. 3 des Bayerischen Denkmalschutzgesetzes?
+        <input type="checkbox" id="bayern_memorial"></br>
+
+        Besteht eine enge räumliche Verbindung der Wohnfläche mit einem Betrieb der Land- und Forstwirtschaft?
+        <input type="checkbox" id="bayern_forestry"></br>
+
+        Hebesatz <input type="number" id="bayern_hebesatz" value="350">%</br>
+
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportBayern()">Berechnen!</button> clicken.
     </div>
 
     <div id="report" style="display:none">
