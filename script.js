@@ -80,16 +80,16 @@ function prepareInputs() {
     if(!land) return;
     if(land.Land == "Hamburg") {
         document.getElementById("ham_eingaben").style.display = "block";
-        document.getElementById("ham_hebesatz").value = 100*town.Hebesatz; // TODO
+        //document.getElementById("ham_hebesatz").value = 100*town.Hebesatz; // TODO
     } else if(land.Land == "Baden-Württemberg") {
         document.getElementById("bw_eingaben").style.display = "block";
-        document.getElementById("bw_hebesatz").value = 100*town.Hebesatz; // TODO
+        //document.getElementById("bw_hebesatz").value = 100*town.Hebesatz; // TODO
     } else if(land.Land == "Bayern") {
         document.getElementById("bayern_eingaben").style.display = "block";
-        document.getElementById("bayern_hebesatz").value = 100*town.Hebesatz; // TODO
+        //document.getElementById("bayern_hebesatz").value = 100*town.Hebesatz; // TODO
     } else {
         document.getElementById("eingaben").style.display = "block";
-        document.getElementById("hebesatz").value = 100*town.Hebesatz;
+        //document.getElementById("hebesatz").value = 100*town.Hebesatz;
     }
 }
 
