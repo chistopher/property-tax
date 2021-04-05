@@ -93,6 +93,24 @@ function prepareInputs() {
     }
 }
 
+function showApartmentQuestion() {
+    let answer = document.getElementById('house_type').value;
+    let checkbox = document.getElementById('apartmentQuestion');
+    if(answer=="MFH" || answer=="WEG")
+        checkbox.style.display = "inline";
+    else
+        checkbox.style.display = "none";
+
+}
+
+function show_ham_question(el) {
+    let question = document.getElementById('ham_usage_question');
+    if(el.checked)
+        question.style.display = "none";
+    else
+        question.style.display = "inline";
+}
+
 function createReport(){
     var report = document.getElementById("report");
     report.style.display = "none";
@@ -154,12 +172,12 @@ function createReport(){
     let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00034;
     if(house_type == "MFH" && social)
         some_factor *= 0.75; // 25% less
-    let annual_tax = round2(object_worth * increase * some_factor);
+    let annual_tax = object_worth * increase * some_factor;
 
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = annual_tax;
+    document.getElementById("tax").innerHTML = round_2(annual_tax);
     report.style.display = "block";
 }
 
@@ -175,12 +193,12 @@ function createReportHamburg() {
     result += area_total * 0.02; // E15
     result += area_indoor * 0.2 * (location=="gut" ? 1.00 : 0.75); // E20
     if(!for_living) result += area_use * 0.4; // E23
-    let annual_tax = round2(result * increase);
+    let annual_tax = result * increase;
 
     document.getElementById("land").innerHTML = "Hamburg";
     document.getElementById("gemeinde").innerHTML = "Hamburg";
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = annual_tax;
+    document.getElementById("tax").innerHTML = round_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
@@ -208,7 +226,7 @@ function createReportBW() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round2(annual_tax);
+    document.getElementById("tax").innerHTML = round_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
@@ -236,7 +254,7 @@ function createReportBayern() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round2(annual_tax);
+    document.getElementById("tax").innerHTML = round_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 

@@ -41,16 +41,17 @@
 
     <div id="eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
-        Anzahl Wohnungen im Objekt <input type="number" id="wohnungen" value="12"></br>
         Baujahr <input type="number" id="baujahr" value="1981"></br>
         Grundstücksfläche <input type="number" id="area_total" value="288"> m<sup>2</sup></br>
         Wohnfläche <input type="number" id="area_indoor" value="99"> m<sup>2</sup></br>
-        Gebäudeart <select id="house_type">
+        Gebäudeart <select id="house_type" onchange="showApartmentQuestion()">
             <option>EFH</option>
             <option selected="selected">MFH</option>
             <option>ZFH</option>
             <option>WEG</option>
-        </select> (§ 249 Grundstücksarten 1.-4.)</br>
+        </select> (§ 249 Grundstücksarten 1.-4.) 
+        <div style="display:inline" id='apartmentQuestion'>Anzahl Wohnungen im Objekt <input type="number" id="wohnungen" value="12"></div>
+        </br>
         Bodenrichtwert <input type="number" id="ground" value="2000"> &euro;</br>
         Hebesatz <input type="number" id="hebesatz" value="0">%</br>
         Sozialer Wohnungsbau <input type="checkbox" id="social"></br>
@@ -60,11 +61,13 @@
 
     <div id="ham_eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
-        Werden Gebäudeflächen vornehmlich zu Wohnzwecken genutzt? (mehr als 50% Wohnfläche) <input type="checkbox" id="ham_zweck"></br>
+        Werden Gebäudeflächen vornehmlich zu Wohnzwecken genutzt? (mehr als 50% Wohnfläche) 
+        <input type="checkbox" id="ham_zweck" checked onchange="show_ham_question(this)">
+        <div id="ham_usage_question" style="display:none">Nutzfläche <input type="number" id="ham_area_use" value="600"> m<sup>2</sup></div>
+        </br>
         Wohnlage <select id="ham_wohnlage"> <option>normal</option> <option>gut</option> </select> </br>
         Grundstücksfläche <input type="number" id="ham_area_total" value="1000"> m<sup>2</sup></br>
         Wohnfläche <input type="number" id="ham_area_indoor" value="200"> m<sup>2</sup></br>
-        Nutzfläche <input type="number" id="ham_area_use" value="600"> m<sup>2</sup></br>
         Hebesatz <input type="number" id="ham_hebesatz" value="0">%</br>
 
         Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportHamburg()">Berechnen!</button> clicken.
@@ -134,7 +137,8 @@
         Bundesland <span id='land'>TODO</span></br>
         Ort <span id='gemeinde'>TODO</span></br>
         AGS <span id='ags'>TODO</span></br>
-        Jährliche Grundsteuer <span id="tax">TODO</span>
+        Jährliche Grundsteuer <span id="tax">TODO</span></br>
+        Der angezeighte Wert ist auf volle Hunderter abgerundet.
     </div>
   </body>
 </html>
