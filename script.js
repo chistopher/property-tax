@@ -13,6 +13,7 @@ function hide(hideAGS = true) {
     document.getElementById("ham_eingaben").style.display = "none";
     document.getElementById("bw_eingaben").style.display = "none";
     document.getElementById("bayern_eingaben").style.display = "none";
+    document.getElementById("hes_eingaben").style.display = "none";
     if(hideAGS) document.getElementById("agsDiv").style.display = "none";
 }
 
@@ -87,6 +88,9 @@ function prepareInputs() {
     } else if(land.Land == "Bayern") {
         document.getElementById("bayern_eingaben").style.display = "block";
         //document.getElementById("bayern_hebesatz").value = 100*town.Hebesatz; // TODO
+    } else if(land.Land == "Hessen") {
+        document.getElementById("hes_eingaben").style.display = "block";
+        //document.getElementById("hes_hebesatz").value = 100*town.Hebesatz; // TODO
     } else {
         document.getElementById("eingaben").style.display = "block";
         //document.getElementById("hebesatz").value = 100*town.Hebesatz;
@@ -177,7 +181,7 @@ function createReport(){
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round_2(annual_tax);
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
     report.style.display = "block";
 }
 
@@ -198,7 +202,36 @@ function createReportHamburg() {
     document.getElementById("land").innerHTML = "Hamburg";
     document.getElementById("gemeinde").innerHTML = "Hamburg";
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round_2(annual_tax);
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("report").style.display = "block";
+}
+
+function createReportHessen() {
+    let memorial = document.getElementById("hes_memorial").checked;
+    let area_total = Number(document.getElementById("hes_area_total").value); 
+    let area_indoor = Number(document.getElementById("hes_area_indoor").value);
+    let area_outdoor = Number(document.getElementById("hes_area_outdoor").value);
+    let ground_value = Number(document.getElementById("hes_ground_value").value);
+    let ground_value_avg = Number(document.getElementById("hes_ground_value_avg").value);
+    let increase = Number(document.getElementById("hes_hebesatz").value)/100;
+
+    // Flaechenbetraege
+    let summand1 = area_total * 0.04;
+    let summand2 = area_indoor * 0.5 * (memorial ? 0.525 : 0.7);
+    let summand3 = area_outdoor * 0.5 * (memorial ? 0.75 : 1.0);
+    let summed = Math.floor(summand1 + summand2 + summand3);
+
+    let factor = floor2(Math.pow(ground_value / ground_value_avg, 0.3));
+
+    // Steuermessbetrag
+    let result = Math.floor(summed * factor);
+
+    let annual_tax = result * increase;
+
+    document.getElementById("land").innerHTML = "Hessen";
+    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
+    document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
@@ -226,7 +259,7 @@ function createReportBW() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round_2(annual_tax);
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
@@ -254,11 +287,12 @@ function createReportBayern() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = round_2(annual_tax);
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
 
 function floor_2(x) { return Math.floor(x/100)*100; }
+function floor2(x) { return Math.floor(x*100)/100; }
 function round_2(x) { return Math.round(x/100)*100; }
 function round1(x) { return Math.round(x*10)/10; }
 function round2(x) { return Math.round(x*100)/100; }

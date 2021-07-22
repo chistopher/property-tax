@@ -73,6 +73,19 @@
         Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportHamburg()">Berechnen!</button> clicken.
     </div>
 
+    <div id="hes_eingaben" style="display:none">
+        <h1>Angaben zum Objekt</h1>
+        Denkmalschutz <input type="checkbox" id="hes_memorial"></br>
+        Grundstücksfläche <input type="number" id="hes_area_total" value="500"> m<sup>2</sup></br>
+        Wohnfläche <input type="number" id="hes_area_indoor" value="140"> m<sup>2</sup></br>
+        Nichtwohnfläche <input type="number" id="hes_area_outdoor" value="0"> m<sup>2</sup></br>
+        Bodenrichtwert <input type="number" id="hes_ground_value" value="100"></br>
+        ø Bodenrichtwert <input type="number" id="hes_ground_value_avg" value="200"></br>
+        Hebesatz <input type="number" id="hes_hebesatz" value="0">%</br>
+
+        Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportHessen()">Berechnen!</button> clicken.
+    </div>
+
     <div id="bw_eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
         Die Steuermesszahl nach Absatz 2 wird um 30 Prozent ermäßigt, wenn das Grundstück (§ 37) überwiegend Wohnzwecken dient. </br>
