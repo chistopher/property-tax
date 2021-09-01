@@ -14,6 +14,7 @@ function hide(hideAGS = true) {
     document.getElementById("bw_eingaben").style.display = "none";
     document.getElementById("bayern_eingaben").style.display = "none";
     document.getElementById("hes_eingaben").style.display = "none";
+    document.getElementById("ns_eingaben").style.display = "none";
     if(hideAGS) document.getElementById("agsDiv").style.display = "none";
 }
 
@@ -77,7 +78,7 @@ function setTown() {
 function prepareInputs() {
     hide(false);
     if(!town) return;
-    land = getLand(town.AGS);
+    let land = getLand(town.AGS);
     if(!land) return;
     if(land.Land == "Hamburg") {
         document.getElementById("ham_eingaben").style.display = "block";
@@ -91,6 +92,9 @@ function prepareInputs() {
     } else if(land.Land == "Hessen") {
         document.getElementById("hes_eingaben").style.display = "block";
         //document.getElementById("hes_hebesatz").value = 100*town.Hebesatz; // TODO
+    } else if(land.Land == "Niedersachsen") {
+        document.getElementById("ns_eingaben").style.display = "block";
+        //document.getElementById("ns_hebesatz").value = 100*town.Hebesatz; // TODO
     } else {
         document.getElementById("eingaben").style.display = "block";
         //document.getElementById("hebesatz").value = 100*town.Hebesatz;
@@ -173,7 +177,7 @@ function createReport(){
     var object_worth = Math.max(min_value, round_2(interesting_ground+cash_clean)); // AP
 
     // Steuermesszahl: 0,34 §15 (1) 2. a)/b)
-    let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00034;
+    let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00031;
     if(house_type == "MFH" && social)
         some_factor *= 0.75; // 25% less
     let annual_tax = object_worth * increase * some_factor;
@@ -229,6 +233,30 @@ function createReportHessen() {
     let annual_tax = result * increase;
 
     document.getElementById("land").innerHTML = "Hessen";
+    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
+    document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("report").style.display = "block";
+}
+
+
+function createReportNiedersachsen() {
+    var lage_select = document.getElementById("ns_lagefactor");
+    var lage = Number(lage_select.options[lage_select.selectedIndex].text); 
+    let area_total = Number(document.getElementById("ns_area_total").value); 
+    let area_indoor = Number(document.getElementById("ns_area_indoor").value);
+    let area_outdoor = Number(document.getElementById("ns_area_outdoor").value);
+    let increase = Number(document.getElementById("ns_hebesatz").value)/100;
+
+    let result_area = lage*area_total * 0.02;
+    let result_indoor = lage*area_indoor * 0.2; // * 0.4 * 0.5
+    let result_outdoor = lage*area_outdoor * 0.4;
+
+    let result = result_area + result_indoor + result_outdoor; // = Grundsteuermessbetrag (GMB)
+
+    let annual_tax = result * increase;
+
+    document.getElementById("land").innerHTML = "Niedersachsen";
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
     document.getElementById("tax").innerHTML = floor_2(annual_tax);

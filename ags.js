@@ -3157,7 +3157,7 @@ var ags = [
 {'Gemeinde': 'Zusamaltheim', 'AGS': '9773188', 'Mietenstufe': '1'},
 {'Gemeinde': 'Zusmarshausen', 'AGS': '9772223', 'Mietenstufe': '2'},
 {'Gemeinde': 'Zwiesel', 'AGS': '9276148', 'Mietenstufe': '1'},
-{'Gemeinde': 'Berlin', 'AGS': '11000000', 'Mietenstufe': ''},
+{'Gemeinde': 'Berlin', 'AGS': '11000000', 'Mietenstufe': '4'},
 {'Gemeinde': 'Ahrensfelde', 'AGS': '12060005', 'Mietenstufe': '4'},
 {'Gemeinde': 'Alt Tucheband', 'AGS': '12064009', 'Mietenstufe': '3'},
 {'Gemeinde': 'Alt Zauche-Wußwerk', 'AGS': '12061005', 'Mietenstufe': '1'},
