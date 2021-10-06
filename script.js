@@ -3,6 +3,8 @@ console.log(ags);
 console.log(lands);
 console.log(mietwert);
 
+ags.sort((lhs, rhs) => { return lhs.Gemeinde.localeCompare(rhs.Gemeinde); });
+
 function getLand(ags) {
     return lands[parseInt(ags.slice(0,-6))-1];
 }
