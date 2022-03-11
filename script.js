@@ -244,19 +244,23 @@ function createReportHessen() {
 
 
 function createReportNiedersachsen() {
-    var lage_select = document.getElementById("ns_lagefactor");
-    var lage = Number(lage_select.options[lage_select.selectedIndex].text); 
+    let ground_value = Number(document.getElementById("ns_ground_value").value);
+    let ground_value_avg = Number(document.getElementById("ns_ground_value_avg").value);
     let area_total = Number(document.getElementById("ns_area_total").value); 
     let area_indoor = Number(document.getElementById("ns_area_indoor").value);
     let area_outdoor = Number(document.getElementById("ns_area_outdoor").value);
     let increase = Number(document.getElementById("ns_hebesatz").value)/100;
 
-    let result_area = lage*area_total * 0.02;
-    let result_indoor = lage*area_indoor * 0.2; // * 0.4 * 0.5
-    let result_outdoor = lage*area_outdoor * 0.4;
+    let lage_factor = floor2(Math.pow(ground_value / ground_value_avg, 0.3));
 
-    let result = result_area + result_indoor + result_outdoor; // = Grundsteuermessbetrag (GMB)
+    let H7 = 10*area_indoor < area_total ? 10*area_indoor : 0;
+    let I7 = area_total-H7;
+    // = ROUNDDOWN(IF(H7>0,(H7*0.04+I7*0.02)*F7,I7*0.04*F7),0) 
+    let L7 = Math.floor(lage_factor * (H7>0 ? H7*0.04 + I7*0.02 : I7*0.04)); // Messbetrag Grund und Boden
+    let M7 = area_indoor * 0.5 * 0.7 * lage_factor; // Messbetrag Wohnfläche
+    let N7 = area_outdoor * 0.5 * lage_factor;  // Messbetrag Nichtwohnfläche
 
+    let result = L7 + M7 + N7;  // = Grundsteuermessbetrag (GMB)
     let annual_tax = result * increase;
 
     document.getElementById("land").innerHTML = "Niedersachsen";
