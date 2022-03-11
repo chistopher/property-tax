@@ -278,11 +278,9 @@ function createReportBW() {
 
     let tax_value = area * ground_value;
     let tax_number = 0.0013;
-    if(for_living) {
-        tax_number *= 0.7;
-        if(b17_answered_yes || (owner_type != "Privatperson"))
-            tax_number *= 0.75;
-    }
+    if(for_living) tax_number *= 0.7;
+    if(b17_answered_yes) tax_number *= 0.75;
+    if(owner_type != "Privatperson") tax_number *= 0.75;
     if(memorial) tax_number *= 0.9;
 
     let result = tax_value * tax_number;
