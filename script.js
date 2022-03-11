@@ -180,13 +180,16 @@ function createReport(){
 
     // Steuermesszahl: 0,34 §15 (1) 2. a)/b)
     let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00031;
+    if(land.Land=="Saarland") some_factor = 0.00034;
     if(house_type == "MFH" && social)
         some_factor *= 0.75; // 25% less
-    let annual_tax = object_worth * increase * some_factor;
+    let result = object_worth * some_factor;
+    let annual_tax = result * increase;
 
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     report.style.display = "block";
 }
@@ -209,6 +212,7 @@ function createReportHamburg() {
     document.getElementById("gemeinde").innerHTML = "Hamburg";
     document.getElementById("ags").innerHTML = town.AGS;
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("report").style.display = "block";
 }
 
@@ -237,6 +241,7 @@ function createReportHessen() {
     document.getElementById("land").innerHTML = "Hessen";
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
@@ -261,6 +266,7 @@ function createReportNiedersachsen() {
     document.getElementById("land").innerHTML = "Niedersachsen";
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
@@ -283,12 +289,14 @@ function createReportBW() {
     }
     if(memorial) tax_number *= 0.9;
 
-    let annual_tax = tax_value * tax_number * increase;
+    let result = tax_value * tax_number;
+    let annual_tax = result * increase;
 
     let land = getLand(town.AGS);
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
@@ -311,12 +319,14 @@ function createReportBayern() {
     if(memorial || forestry) tax_number *= 0.75; // 25% less
     let house_tax = house_value * tax_number;
 
-    let annual_tax = (ground_tax + house_tax) * increase;
+    let result = ground_tax + house_tax;
+    let annual_tax = result * increase;
 
     let land = getLand(town.AGS);
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
+    document.getElementById("pretax").innerHTML = floor2(result);
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
