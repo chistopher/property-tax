@@ -225,12 +225,12 @@ function createReportHessen() {
     let summand1 = area_total * 0.04;
     let summand2 = area_indoor * 0.5 * (memorial ? 0.525 : 0.7);
     let summand3 = area_outdoor * 0.5 * (memorial ? 0.75 : 1.0);
-    let summed = Math.floor(summand1 + summand2 + summand3);
+    let summed = summand1 + summand2 + summand3;
 
     let factor = floor2(Math.pow(ground_value / ground_value_avg, 0.3));
 
     // Steuermessbetrag
-    let result = Math.floor(summed * factor);
+    let result = summed * factor;
 
     let annual_tax = result * increase;
 
