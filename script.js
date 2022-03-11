@@ -300,24 +300,26 @@ function createReportBW() {
 }
 
 function createReportBayern() {
-    let area = Number(document.getElementById("bayern_area").value); 
+    let area_total = Number(document.getElementById("bayern_area").value); 
     let area_house = Number(document.getElementById("bayern_area_house").value); 
-    let area_living = Number(document.getElementById("bayern_area_living").value); 
     let increase = Number(document.getElementById("bayern_hebesatz").value)/100; 
     let memorial = document.getElementById("bayern_memorial").checked;
     let forestry = document.getElementById("bayern_forestry").checked;
+    let social = document.getElementById("bayern_social").checked;
 
-    let C15 = area - 10*area_house;
-    let D15 = area_house * 10;
-    let ground_value = C15>0 ? D15*0.04 + C15*0.02 : area * 0.04;
-    let ground_tax = round1(ground_value);
+    let C15 = 10*area_house < area_total ? 10*area_house : 0;
+    let D15 = area_total - C15;
 
-    let house_value = Math.round(area_living * 0.5);
-    let tax_number = 0.7;
-    if(memorial || forestry) tax_number *= 0.75; // 25% less
-    let house_tax = house_value * tax_number;
+    // =IF(C15>0,ROUNDDOWN(D15*0.02+C15*0.04,1),ROUNDDOWN(B15*0.04,1))
+    let ground_value = floor1(C15>0 ? D15*0.02 + C15*0.04 : area_total * 0.04);
+    let house_value = Math.floor(area_house * 0.5) * 0.7;
+    if(memorial) house_value *= 0.75;
+    if(forestry) house_value *= 0.75;
+    if(social) house_value *= 0.75;
+    house_value = Math.floor(house_value);
 
-    let result = ground_tax + house_tax;
+
+    let result = ground_value + house_value;
     let annual_tax = result * increase;
 
     let land = getLand(town.AGS);
@@ -330,6 +332,7 @@ function createReportBayern() {
 }
 
 function floor_2(x) { return Math.floor(x/100)*100; }
+function floor1(x) { return Math.floor(x*10)/10; }
 function floor2(x) { return Math.floor(x*100)/100; }
 function round_2(x) { return Math.round(x/100)*100; }
 function round1(x) { return Math.round(x*10)/10; }
