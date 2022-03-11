@@ -61,13 +61,13 @@
 
     <div id="ham_eingaben" style="display:none">
         <h1>Angaben zum Objekt</h1>
-        Werden Gebäudeflächen vornehmlich zu Wohnzwecken genutzt? (mehr als 50% Wohnfläche) 
-        <input type="checkbox" id="ham_zweck" checked onchange="show_ham_question(this)">
-        <div id="ham_usage_question" style="display:none">Nutzfläche <input type="number" id="ham_area_use" value="600"> m<sup>2</sup></div>
-        </br>
+        Handelt es sich bei Ihrem Gebäude um ein Baudenkmal? <input type="checkbox" id="ham_denk"></br>
+        Baudenkmal nach § 4 Absatz 2 Satz 1 oder ein Ensemble nach § 4 Absatz 3 
+        des Hamburgischen Denkmalschutzgesetzes vom 5. April 2013 (HmbGVBl. S. 142), 
+        geändert am 26. Juni 2020 (HmbGVBl. S. 380, 384), in der jeweils geltenden Fassung.</br>
         Wohnlage <select id="ham_wohnlage"> <option>normal</option> <option>gut</option> </select> </br>
         Grundstücksfläche <input type="number" id="ham_area_total" value="1000"> m<sup>2</sup></br>
-        Wohnfläche <input type="number" id="ham_area_indoor" value="200"> m<sup>2</sup></br>
+        Bruttogebäudefläche <input type="number" id="ham_area_house" value="100"> m<sup>2</sup></br>
         Hebesatz <input type="number" id="ham_hebesatz" value="0">%</br>
 
         Nach dem Anpassen aller Angaben bitte auf <button type="button" onclick="createReportHamburg()">Berechnen!</button> clicken.

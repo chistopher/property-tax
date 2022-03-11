@@ -113,14 +113,6 @@ function showApartmentQuestion() {
 
 }
 
-function show_ham_question(el) {
-    let question = document.getElementById('ham_usage_question');
-    if(el.checked)
-        question.style.display = "none";
-    else
-        question.style.display = "inline";
-}
-
 function createReport(){
     var report = document.getElementById("report");
     report.style.display = "none";
@@ -195,17 +187,21 @@ function createReport(){
 }
 
 function createReportHamburg() {
-    let for_living = document.getElementById("ham_zweck").checked;
+    let denkmal = document.getElementById("ham_denk").checked;
     let location = document.getElementById("ham_wohnlage").value;
     let area_total = Number(document.getElementById("ham_area_total").value); 
-    let area_indoor = Number(document.getElementById("ham_area_indoor").value);
-    let area_use = Number(document.getElementById("ham_area_use").value);
+    let area_house = Number(document.getElementById("ham_area_house").value);
     let increase = Number(document.getElementById("ham_hebesatz").value)/100;
 
-    let result = 0;
-    result += area_total * 0.02; // E15
-    result += area_indoor * 0.2 * (location=="gut" ? 1.00 : 0.75); // E20
-    if(!for_living) result += area_use * 0.4; // E23
+    let A16 = 10*area_house < area_total ? 10*area_house : 0;
+    let A17 = area_total - A16;
+    let equiv_num = 0.5*0.7;
+    if(denkmal) equiv_num *= 0.75;
+    if(location=="normal") equiv_num *= 0.75;
+    let G17 = A16>0 ? A16*0.04+A17*0.02 : A17*0.04; // total area tax
+    let G22 = Math.floor(area_house * equiv_num); // house area tax
+
+    let result = G17 + G22;
     let annual_tax = result * increase;
 
     document.getElementById("land").innerHTML = "Hamburg";
@@ -326,7 +322,7 @@ function createReportBayern() {
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = floor2(result);
+    document.getElementById("pretax").innerHTML = result;
     document.getElementById("tax").innerHTML = floor_2(annual_tax);
     document.getElementById("report").style.display = "block";
 }
