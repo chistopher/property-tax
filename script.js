@@ -17,6 +17,7 @@ function hide(hideAGS = true) {
     document.getElementById("bayern_eingaben").style.display = "none";
     document.getElementById("hes_eingaben").style.display = "none";
     document.getElementById("ns_eingaben").style.display = "none";
+    document.getElementById("intermediates").style.display = "none";
     if(hideAGS) document.getElementById("agsDiv").style.display = "none";
 }
 
@@ -181,12 +182,13 @@ function createReport(){
     let result = object_worth * some_factor;
     let annual_tax = result * increase;
 
-    document.getElementById("land").innerHTML = land.Land;
-    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
-    document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = floor2(result);
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
-    report.style.display = "block";
+    showReport(result, annual_tax, 
+       `jährlicher Rohertrag ${floor2(annual_raw)}</br>
+        nicht umlagefähige Bewirtschaftungskosten ${non_relocatable_cost}</br>
+        jährlicher Reinertrag ${annual_clean}</br>
+        Vervielfältiger ${multiplier}</br>
+        Barwert des Reinertrags ${cash_clean}</br>
+        abgezinster Bodenwert ${interesting_ground}</br>`);
 }
 
 function createReportHamburg() {
@@ -207,12 +209,7 @@ function createReportHamburg() {
     let result = G17 + G22;
     let annual_tax = result * increase;
 
-    document.getElementById("land").innerHTML = "Hamburg";
-    document.getElementById("gemeinde").innerHTML = "Hamburg";
-    document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
-    document.getElementById("pretax").innerHTML = floor2(result);
-    document.getElementById("report").style.display = "block";
+    showReport(result, annual_tax, `Bodenwert ${floor2(G17)}</br>Gebäudewert ${floor2(G22)}`);
 }
 
 function createReportHessen() {
@@ -237,12 +234,7 @@ function createReportHessen() {
 
     let annual_tax = result * increase;
 
-    document.getElementById("land").innerHTML = "Hessen";
-    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
-    document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = floor2(result);
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
-    document.getElementById("report").style.display = "block";
+    showReport(result, annual_tax, "");
 }
 
 
@@ -266,12 +258,7 @@ function createReportNiedersachsen() {
     let result = L7 + M7 + N7;  // = Grundsteuermessbetrag (GMB)
     let annual_tax = result * increase;
 
-    document.getElementById("land").innerHTML = "Niedersachsen";
-    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
-    document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = floor2(result);
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
-    document.getElementById("report").style.display = "block";
+    showReport(result, annual_tax, "");
 }
 
 function createReportBW() {
@@ -293,13 +280,7 @@ function createReportBW() {
     let result = tax_value * tax_number;
     let annual_tax = result * increase;
 
-    let land = getLand(town.AGS);
-    document.getElementById("land").innerHTML = land.Land;
-    document.getElementById("gemeinde").innerHTML = town.Gemeinde;
-    document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = floor2(result);
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
-    document.getElementById("report").style.display = "block";
+    showReport(result,annual_tax,"");
 }
 
 function createReportBayern() {
@@ -325,13 +306,22 @@ function createReportBayern() {
     let result = ground_value + house_value;
     let annual_tax = result * increase;
 
+    showReport(result, annual_tax,
+        `Grundsteuermessbetrag Boden ${ground_value}</br>
+        Grundsteuermessbetrag Gebäude ${house_value}`);
+}
+
+function showReport(pretax, annual_tax, intermediates) {
     let land = getLand(town.AGS);
     document.getElementById("land").innerHTML = land.Land;
     document.getElementById("gemeinde").innerHTML = town.Gemeinde;
     document.getElementById("ags").innerHTML = town.AGS;
-    document.getElementById("pretax").innerHTML = result;
-    document.getElementById("tax").innerHTML = floor_2(annual_tax);
+    document.getElementById("pretax").innerHTML = floor2(pretax);
+    document.getElementById("tax").innerHTML = floor2(annual_tax);
     document.getElementById("report").style.display = "block";
+    if(!intermediates) return;
+    document.getElementById("intermediates").style.display = "block";
+    document.getElementById("intermediate_values").innerHTML = intermediates;
 }
 
 function floor_2(x) { return Math.floor(x/100)*100; }
