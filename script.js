@@ -106,7 +106,7 @@ function prepareInputs() {
 function showApartmentQuestion() {
     let answer = document.getElementById('house_type').value;
     let checkbox = document.getElementById('apartmentQuestion');
-    if(answer=="MFH" || answer=="WEG")
+    if(answer=="MFH")
         checkbox.style.display = "inline";
     else
         checkbox.style.display = "none";
@@ -129,6 +129,8 @@ function createReport(){
     var ground = Number(document.getElementById("ground").value); // AA
     var increase = Number(document.getElementById("hebesatz").value)/100; // AQ
     var social = document.getElementById("social").checked; // AR
+    let parking = document.getElementById("parking").checked; // A17
+    let memorial = document.getElementById("memorial").checked; // AS
 
     var kennwert_land = parseInt(land.Kennwert); // E
     var kennwert_year = kennwertBaujahr(baujahr); // H
@@ -145,13 +147,14 @@ function createReport(){
 
     var interest = kapitalisierung(house_type == "MFH" ? flats : ground, house_type); // O
     // Anlage 12 Anlage 38 (zu § 253 Absatz 2 und 259 Absatz 4)
-    var remaining_usage = Math.max(0, 80-(new Date().getFullYear()-baujahr)); // P
+    //var remaining_usage = Math.max(0, 80-(new Date().getFullYear()-baujahr)); // P
+    let remaining_usage = Math.max(0, 80-(2019-baujahr)); // P
     // §258 (2)
     var remaining_usage_capped = Math.max(24, remaining_usage); // Q
     var kennwert_usage = remaining_usage_capped - 22; // R
     // Anlage 14 Anlage 40 (zu § 255 Absatz 2)
     var tax_non_relocatable = bewirtschaftungskosten(remaining_usage_capped, house_type); // T
-    var annual_raw = round2(12 * area_indoor * value_avg_rent2); // AH
+    var annual_raw = 12 * area_indoor * value_avg_rent2 + (parking ? 35 : 0); // AH
     var non_relocatable_cost = round2(annual_raw * (tax_non_relocatable / 100)); // U
     // Anlage 10 Anlage 36 (zu § 251 und § 257 Absatz 1)
     var coefficient = umrechnungskoeffizient(area_total, house_type); // AF
@@ -171,10 +174,10 @@ function createReport(){
     var object_worth = Math.max(min_value, round_2(interesting_ground+cash_clean)); // AP
 
     // Steuermesszahl: 0,34 §15 (1) 2. a)/b)
-    let some_factor = (land.Land=="Sachsen") ? 0.00036 : 0.00031;
-    if(land.Land=="Saarland") some_factor = 0.00034;
-    if(house_type == "MFH" && social)
-        some_factor *= 0.75; // 25% less
+    let steuermesszahl_base = 0.00031;
+    if(land.Land=="Sachsen") steuermesszahl_base = 0.00036;
+    if(land.Land=="Saarland") steuermesszahl_base = 0.00034;
+    let some_factor = (1.0 - 0.25 * social - 0.1*memorial) * steuermesszahl_base;
     let result = object_worth * some_factor;
     let annual_tax = result * increase;
 
