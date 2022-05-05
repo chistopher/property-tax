@@ -203,13 +203,13 @@ function createReportHamburg() {
     let equiv_num = 0.5*0.7;
     if(denkmal) equiv_num *= 0.75;
     if(location=="normal") equiv_num *= 0.75;
-    let G17 = A16>0 ? A16*0.04+A17*0.02 : A17*0.04; // total area tax
+    let G17 = floor1(A16>0 ? A16*0.04+A17*0.02 : A17*0.04); // total area tax
     let G22 = Math.floor(area_house * equiv_num); // house area tax
 
     let result = G17 + G22;
     let annual_tax = result * increase;
 
-    showReport(result, annual_tax, `Bodenwert ${floor2(G17)}</br>Gebäudewert ${floor2(G22)}`);
+    showReport(result, annual_tax, `Bodenwert ${G17}</br>Gebäudewert ${G22}`);
 }
 
 function createReportHessen() {
@@ -252,7 +252,7 @@ function createReportNiedersachsen() {
     let I7 = area_total-H7;
     // = ROUNDDOWN(IF(H7>0,(H7*0.04+I7*0.02)*F7,I7*0.04*F7),0) 
     let L7 = Math.floor(lage_factor * (H7>0 ? H7*0.04 + I7*0.02 : I7*0.04)); // Messbetrag Grund und Boden
-    let M7 = area_indoor * 0.5 * 0.7 * lage_factor; // Messbetrag Wohnfläche
+    let M7 = Math.floor(area_indoor * 0.5 * 0.7 * lage_factor); // Messbetrag Wohnfläche
     let N7 = area_outdoor * 0.5 * lage_factor;  // Messbetrag Nichtwohnfläche
 
     let result = L7 + M7 + N7;  // = Grundsteuermessbetrag (GMB)
@@ -263,7 +263,6 @@ function createReportNiedersachsen() {
 
 function createReportBW() {
     let area = Number(document.getElementById("bw_area").value); 
-    let owner_type = document.getElementById("bw_owner_type").value
     let for_living = document.getElementById("bw_zweck").checked;
     let b17_answered_yes = document.getElementById("bw_option1").checked || document.getElementById("bw_option2").checked;
     let increase = Number(document.getElementById("bw_hebesatz").value)/100; 
@@ -272,10 +271,11 @@ function createReportBW() {
 
     let tax_value = area * ground_value;
     let tax_number = 0.0013;
-    if(for_living) tax_number *= 0.7;
-    if(b17_answered_yes) tax_number *= 0.75;
-    if(owner_type != "Privatperson") tax_number *= 0.75;
-    if(memorial) tax_number *= 0.9;
+    let reduction = 0;
+    if(for_living) reduction += 0.3;
+    if(b17_answered_yes) reduction += 0.25;
+    if(memorial) reduction += 0.1;
+    tax_number *= (1-reduction);
 
     let result = tax_value * tax_number;
     let annual_tax = result * increase;
