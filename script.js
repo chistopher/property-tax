@@ -106,12 +106,10 @@ function prepareInputs() {
 
 function showApartmentQuestion() {
     let answer = document.getElementById('house_type').value;
-    let checkbox = document.getElementById('apartmentQuestion');
-    if(answer=="MFH")
-        checkbox.style.display = "inline";
-    else
-        checkbox.style.display = "none";
-
+    let MFG_popup = document.getElementById('apartmentQuestion_num');
+    let WEG_popup = document.getElementById('apartmentQuestion_fraction');
+    MFG_popup.style.display = (answer=="MFH" ? "inline" : "none");
+    WEG_popup.style.display = (answer=="WEG" ? "inline" : "none");
 }
 
 function createReport(){
@@ -121,58 +119,59 @@ function createReport(){
     var land = getLand(town.AGS); // first two digits of AGS
     if(!land) return;
 
-    var flats = Number(document.getElementById("wohnungen").value); // F
-    var baujahr = Number(document.getElementById("baujahr").value); // G
-    var area_indoor = Number(document.getElementById("area_indoor").value); // L
-    var area_total = Number(document.getElementById("area_total").value); // V
+    var flats = Number(document.getElementById("wohnungen").value); // G
+    var baujahr = Number(document.getElementById("baujahr").value); // H
+    var area_indoor = Number(document.getElementById("area_indoor").value); // M
+    var area_total = Number(document.getElementById("area_total").value); // Y
     var type_select = document.getElementById("house_type");
-    var house_type = type_select.options[type_select.selectedIndex].text; // W
-    var ground = Number(document.getElementById("ground").value); // AA
-    var increase = Number(document.getElementById("hebesatz").value)/100; // AQ
-    var social = document.getElementById("social").checked; // AR
-    let parking = document.getElementById("parking").checked; // A17
-    let memorial = document.getElementById("memorial").checked; // AS
+    var house_type = type_select.options[type_select.selectedIndex].text; // F
+    let fraction_top = Number(document.getElementById("fraction1").value); // W
+    let fraction_bottom = Number(document.getElementById("fraction2").value); // X
+    var ground = Number(document.getElementById("ground").value); // AC
+    var increase = Number(document.getElementById("hebesatz").value)/100; // AS
+    var social = document.getElementById("social").checked; // AT
+    let num_parking = Number(document.getElementById("parking").value); // A17
+    let memorial = document.getElementById("memorial").checked; // AU
 
     var kennwert_land = parseInt(land.Kennwert); // E
-    var kennwert_year = kennwertBaujahr(baujahr); // H
-    var kennwert_house_rent = kennwertHouse(house_type)[0]; // X
-    var kennwert_house_raw = kennwertHouse(house_type)[1]; // Y
-    var kennwert_area = kennwertArea(area_indoor); // N
+    var kennwert_year = kennwertBaujahr(baujahr); // I
+    var kennwert_house_rent = kennwertHouse(house_type)[0]; // Z
+    var kennwert_house_raw = kennwertHouse(house_type)[1]; // AA
+    var kennwert_area = kennwertArea(area_indoor); // O
 
-    var mietstufe = parseInt(town.Mietenstufe); // I
-    var area_per_flat = area_indoor/flats; // M
+    var mietstufe = parseInt(town.Mietenstufe); // J
 
-    var value_avg_rent1 = mietwert[kennwert_land+kennwert_house_rent+kennwert_area][kennwert_year-2]; // J
+    var value_avg_rent1 = mietwert[kennwert_land+kennwert_house_rent+kennwert_area][kennwert_year-2]; // K
     var mietstufen_factor = [0.775, 0.9, 1.0, 1.1, 1.2, 1.325]; // Miete + Zu-/Abschlag Mietstufe Anlage 13 Anlage 39 (zu § 254 Absatz 2) II.
-    var value_avg_rent2 = round2(mietstufen_factor[mietstufe-1] * value_avg_rent1); // K
+    var value_avg_rent2 = mietstufen_factor[mietstufe-1] * value_avg_rent1; // L
 
-    var interest = kapitalisierung(house_type == "MFH" ? flats : ground, house_type); // O
+    var interest = kapitalisierung(house_type == "MFH" ? flats : ground, house_type); // P
     // Anlage 12 Anlage 38 (zu § 253 Absatz 2 und 259 Absatz 4)
-    //var remaining_usage = Math.max(0, 80-(new Date().getFullYear()-baujahr)); // P
-    let remaining_usage = Math.max(0, 80-(2019-baujahr)); // P
+    let remaining_usage = Math.max(0, 80-(2022-baujahr)); // Q
     // §258 (2)
-    var remaining_usage_capped = Math.max(24, remaining_usage); // Q
-    var kennwert_usage = remaining_usage_capped - 22; // R
+    var remaining_usage_capped = Math.max(24, remaining_usage); // R
+    var kennwert_usage = remaining_usage_capped - 22; // S
     // Anlage 14 Anlage 40 (zu § 255 Absatz 2)
-    var tax_non_relocatable = bewirtschaftungskosten(remaining_usage_capped, house_type); // T
-    var annual_raw = 12 * area_indoor * value_avg_rent2 + (parking ? 35 : 0); // AH
-    var non_relocatable_cost = round2(annual_raw * (tax_non_relocatable / 100)); // U
+    var tax_non_relocatable = bewirtschaftungskosten(remaining_usage_capped, house_type); // U
+    var annual_raw = 12 * area_indoor * value_avg_rent2 + num_parking * 35; // AJ
+    var non_relocatable_cost = annual_raw * (tax_non_relocatable / 100); // V
     // Anlage 10 Anlage 36 (zu § 251 und § 257 Absatz 1)
-    var coefficient = umrechnungskoeffizient(area_total, house_type); // AF
-    var ground_value = round2(area_total * ground * coefficient); // AG
+    var coefficient = umrechnungskoeffizient(area_total, house_type); // AH
+    var ground_value = area_total * ground * coefficient; // AI
+    if(house_type=="WEG") ground_value *= fraction_top / fraction_bottom;
 
-    var annual_clean = round2(annual_raw - non_relocatable_cost); // AI
-    var tax_factor = round3(1 + interest/100); // AJ
+    var annual_clean = annual_raw - non_relocatable_cost; // AK
+    var tax_factor = round3(1 + interest/100); // AL
     // Anlage 11 Anlage 37 (zu § 253 Absatz 2)
     // (1/(AJ18^Q18))*(((AJ18^Q18)-1)/(AJ18-1))
     var aj_q = Math.pow(tax_factor,remaining_usage_capped);
-    var multiplier = round2((1/aj_q)*((aj_q-1)/(tax_factor-1))); // AK
+    var multiplier = (1/aj_q)*((aj_q-1)/(tax_factor-1)); // AM
     // Anlage 15 Anlage 41 (zu § 257 Absatz 2)
-    var detaxinator = round4(1/aj_q); // AL
-    var interesting_ground = round2(ground_value * detaxinator); // AM
-    var cash_clean = round2(annual_clean*multiplier); // AN
-    var min_value = round_2(ground * area_total)*0.75; // AO
-    var object_worth = Math.max(min_value, round_2(interesting_ground+cash_clean)); // AP
+    var detaxinator = round4(1/aj_q); // AN
+    var interesting_ground = round2(ground_value * detaxinator); // AO
+    var cash_clean = round2(annual_clean*multiplier); // AP
+    var min_value = round_2(ground * area_total*0.75); // AQ
+    var object_worth = Math.max(min_value, round_2(interesting_ground+cash_clean)); // AR
 
     // Steuermesszahl: 0,34 §15 (1) 2. a)/b)
     let steuermesszahl_base = 0.00031;
@@ -184,11 +183,11 @@ function createReport(){
 
     showReport(result, annual_tax, 
        `jährlicher Rohertrag ${floor2(annual_raw)}</br>
-        nicht umlagefähige Bewirtschaftungskosten ${non_relocatable_cost}</br>
-        jährlicher Reinertrag ${annual_clean}</br>
-        Vervielfältiger ${multiplier}</br>
-        Barwert des Reinertrags ${cash_clean}</br>
-        abgezinster Bodenwert ${interesting_ground}</br>`);
+        nicht umlagefähige Bewirtschaftungskosten ${floor2(non_relocatable_cost)}</br>
+        jährlicher Reinertrag ${floor2(annual_clean)}</br>
+        Vervielfältiger ${floor2(multiplier)}</br>
+        Barwert des Reinertrags ${floor2(cash_clean)}</br>
+        abgezinster Bodenwert ${floor2(interesting_ground)}</br>`);
 }
 
 function createReportHamburg() {
